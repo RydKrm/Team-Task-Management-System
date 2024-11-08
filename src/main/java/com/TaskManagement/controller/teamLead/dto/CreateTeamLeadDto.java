@@ -14,6 +14,4 @@ import lombok.NoArgsConstructor;
 public class CreateTeamLeadDto extends CreateUserDto {
     @NotNull(message = "Company id is required")
     private Long companyId;
-    @NotNull(message = "Team id is required")
-    private Long teamId;
 }

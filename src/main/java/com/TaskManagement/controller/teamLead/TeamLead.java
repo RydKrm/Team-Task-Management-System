@@ -2,6 +2,7 @@ package com.TaskManagement.controller.teamLead;
 
 import com.TaskManagement.controller.company.Company;
 import com.TaskManagement.controller.team.Team;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -41,14 +42,16 @@ public class TeamLead {
 
     @NotNull(message = "Team Field is required")
     @ManyToOne(fetch = FetchType.EAGER)
-    private Team team;
-
-    @NotNull(message = "Team Field is required")
-    @ManyToOne(fetch = FetchType.EAGER)
     private Company company;
 
+    @NotNull(message = "Team id is required")
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
     private boolean active = true;
-    private String role = "TeamMember";
+    private String role = "TeamLead";
 
     public boolean getActive() {
         return active;

@@ -1,21 +1,17 @@
 package com.TaskManagement.controller.team;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import com.TaskManagement.controller.project.Project;
+import com.TaskManagement.controller.teamMember.TeamMember;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import org.hibernate.validator.constraints.Length;
 
 import com.TaskManagement.controller.company.Company;
-import com.TaskManagement.controller.teamMember.TeamMember;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,14 +42,17 @@ public class Team {
 
     @NotNull(message = "Company is required")
     @ManyToOne(fetch = FetchType.EAGER)
-    // @JsonIgnore
+    @JoinColumn(name = "company_id")
     private Company company;
     
-    @OneToMany(mappedBy = "id", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<TeamMember> teamMember;
 
     private boolean active = true;
+
+    @ManyToMany(mappedBy = "teamList")
+    private Set<Project> projectList = new HashSet<>();
 
     public boolean getActive() {
         return this.active;

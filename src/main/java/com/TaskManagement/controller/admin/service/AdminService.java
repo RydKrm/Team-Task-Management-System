@@ -76,13 +76,6 @@ public class AdminService {
         String token = jwtService.generateToken(getAdmin.getId(), "Admin", 100000);
 
         Claims tokenData = jwtService.extractAllClaims(token);
-
-        System.out.println("Token data: " + tokenData);
-
-        System.out.println("role " + tokenData.get("role"));
-        System.out.println("id " + tokenData.get("id"));
-        // String token = "test";
-        // String token = jwtService
         HashMap<String, Object> returnData = new HashMap<String, Object>();
 
         returnData.put("token", token);
@@ -97,10 +90,8 @@ public class AdminService {
         Page<Admin> adminPage = (search != null) ?
                 adminRepository.findByNameOrPhoneNumberWithRegex(search, pageable) :
                 adminRepository.findAll(pageable);
-        // Page<Admin> adminPage = adminRepository.findAll(pageable);
 
         List<Admin> list = adminPage.getContent();
-        // List<Admin> list = adminRepository.findAll();
         System.out.println("admin list " + list);
 
         long totalDocs = adminPage.getTotalElements();

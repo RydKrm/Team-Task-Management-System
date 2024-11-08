@@ -100,11 +100,6 @@ public class CompanyService {
     public void updateStatus(Long id) {
         Company getCompany = CompanyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found by id"));
-        // if (getCompany.getActive() == true) {
-        //     getCompany.setActive(false);
-        // } else {
-        //     getCompany.setActive(true);
-        // }
 
         getCompany.setActive(!getCompany.getActive());
         CompanyRepository.save(getCompany);

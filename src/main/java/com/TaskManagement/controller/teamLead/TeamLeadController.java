@@ -21,130 +21,130 @@ import java.util.Map;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1/TeamMember")
-@Tag(name = "TeamMember Controller", description = "TeamMember API List")
+@RequestMapping("/api/v1/team-lead")
+@Tag(name = "TeamLead Controller", description = "TeamLead API List")
 public class TeamLeadController {
     @Autowired
-    private final TeamLeadService teamMemberService;
+    private final TeamLeadService TeamLeadService;
 
-    @Operation(summary = "Create a new TeamMember", description = "Add a new TeamMember with given details")
+    @Operation(summary = "Create a new TeamLead", description = "Add a new TeamLead with given details")
     @PostMapping()
-    public ResponseEntity<Response> createTeamMember(@Valid @RequestBody CreateTeamLeadDto data) {
+    public ResponseEntity<Response> createTeamLead(@Valid @RequestBody CreateTeamLeadDto data) {
         try {
-            TeamLead getTeamMember = teamMemberService.createTeamMember(data);
-            return ResponseEntity.ok(new PositiveResponse("TeamMember Created", getTeamMember));
+            TeamLead getTeamLead = TeamLeadService.createTeamLead(data);
+            return ResponseEntity.ok(new PositiveResponse("TeamLead Created", getTeamLead));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }
     }
 
-    @Operation(summary = "Get All TeamMember with pagination", description="Get all TeamMember with pagination , search query return data list, total documents and page number")
+    @Operation(summary = "Get All TeamLead with pagination", description="Get all TeamLead with pagination , search query return data list, total documents and page number")
     @GetMapping()
-    public ResponseEntity<Response> getAllTeamMember(
+    public ResponseEntity<Response> getAllTeamLead(
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int limit,
         @RequestParam(required = false) String search
     ) {
         try {
             return ResponseEntity
-                    .ok(new PositiveResponse("TeamMember list ", teamMemberService.getAllTeamMember(page, limit, search)));
+                    .ok(new PositiveResponse("TeamLead list ", TeamLeadService.getAllTeamLead(page, limit, search)));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse("Something wrong"));
         }
     }
 
-    @Operation(summary = "TeamMember Login Controller", description = "TeamMember Login in request, Request with email and password")
+    @Operation(summary = "TeamLead Login Controller", description = "TeamLead Login in request, Request with email and password")
     @PostMapping("/login")
-    public ResponseEntity<Response> TeamMemberLogin(@Valid @RequestBody LoginDto data) {
+    public ResponseEntity<Response> TeamLeadLogin(@Valid @RequestBody LoginDto data) {
         try {
-            HashMap<String, Object> response = teamMemberService.TeamMemberLogin(data);
+            HashMap<String, Object> response = TeamLeadService.TeamLeadLogin(data);
             return ResponseEntity.ok(new PositiveResponse("Login successfully ", response));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }
     }
 
-    @Operation(summary = "Get All Active TeamMember ", description = "Get the active TeamMember list, which status is active")
+    @Operation(summary = "Get All Active TeamLead ", description = "Get the active TeamLead list, which status is active")
     @GetMapping("/active")
-    public ResponseEntity<Response> getActiveTeamMemberList(
+    public ResponseEntity<Response> getActiveTeamLeadList(
         @RequestParam(defaultValue = "1") int page,
        @RequestParam(defaultValue = "10") int limit,
        @RequestParam(required = false) String search
     ) {
         try {
-            Map<String, Object> TeamMemberList = teamMemberService.getAllActiveTeamMember(page, limit, search, true);
-            return ResponseEntity.ok(new PositiveResponse("Active TeamMember list", TeamMemberList));
+            Map<String, Object> TeamLeadList = TeamLeadService.getAllActiveTeamLead(page, limit, search, true);
+            return ResponseEntity.ok(new PositiveResponse("Active TeamLead list", TeamLeadList));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }
     }
 
-    @Operation(summary = "Get All Not Active TeamMember ", description = "Get the non active TeamMember list, which status is active")
+    @Operation(summary = "Get All Not Active TeamLead ", description = "Get the non active TeamLead list, which status is active")
     @GetMapping("/turnOff")
-    public ResponseEntity<Response> getNotActiveTeamMemberList(
+    public ResponseEntity<Response> getNotActiveTeamLeadList(
         @RequestParam(defaultValue = "1") int page,
        @RequestParam(defaultValue = "10") int limit,
        @RequestParam(required = false) String search
     ) {
         try {
-            Map<String, Object> TeamMemberList = teamMemberService.getAllActiveTeamMember(page, limit, search, false);
-            return ResponseEntity.ok(new PositiveResponse("Status false TeamMember list", TeamMemberList));
+            Map<String, Object> TeamLeadList = TeamLeadService.getAllActiveTeamLead(page, limit, search, false);
+            return ResponseEntity.ok(new PositiveResponse("Status false TeamLead list", TeamLeadList));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }
     }
     
 
-    @Operation(summary = "Get Single TeamMember", description = "Get Single TeamMember by id")
+    @Operation(summary = "Get Single TeamLead", description = "Get Single TeamLead by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Response> getSingleTeamMember(@PathVariable Long id) {
+    public ResponseEntity<Response> getSingleTeamLead(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(new PositiveResponse("TeamMember found by id", teamMemberService.getTeamMemberById(id)));
+            return ResponseEntity.ok(new PositiveResponse("TeamLead found by id", TeamLeadService.getTeamLeadById(id)));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }
     }
 
-    @Operation(summary ="Update TeamMember ", description="TeamMember update require TeamMember id and updated fields, password cannot be updated with this request")
+    @Operation(summary ="Update TeamLead ", description="TeamLead update require TeamLead id and updated fields, password cannot be updated with this request")
     @PatchMapping("/{id}")
-    public ResponseEntity<Response> updateTeamMember(@PathVariable Long id,@Valid @RequestBody UpdateTeamLeadDto data) {
+    public ResponseEntity<Response> updateTeamLead(@PathVariable Long id,@Valid @RequestBody UpdateTeamLeadDto data) {
         try {
             System.out.println("testing in controller");
             return ResponseEntity
-                    .ok(new PositiveResponse("TeamMember data updated successfully", teamMemberService.updateTeamMember(id, data)));
+                    .ok(new PositiveResponse("TeamLead data updated successfully", TeamLeadService.updateTeamLead(id, data)));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }
     }
 
-    @Operation(summary = "Update TeamMember status ", description = "This request will be toggle the TeamMember status field")
+    @Operation(summary = "Update TeamLead status ", description = "This request will be toggle the TeamLead status field")
     @PatchMapping("/update-status/{id}")
     public ResponseEntity<Response> updateStatus(@PathVariable Long id) {
         try {
-            teamMemberService.updateStatus(id);
-            return ResponseEntity.ok(new PositiveResponse("TeamMember status updated", null));
+            TeamLeadService.updateStatus(id);
+            return ResponseEntity.ok(new PositiveResponse("TeamLead status updated", null));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }
     }
 
-    @Operation(summary = "TeamMember Update Password", description = "TeamMember old and new password is required to update")
+    @Operation(summary = "TeamLead Update Password", description = "TeamLead old and new password is required to update")
     @PatchMapping("/update-password/{id}")
     public ResponseEntity<Response> updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordDto data) {
         try {
-            teamMemberService.updatePassword(id, data);
+            TeamLeadService.updatePassword(id, data);
             return ResponseEntity.ok(new PositiveResponse("Password update successfully", null));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }
     }
     
-    @Operation(summary = "TeamMember Delete by id")
+    @Operation(summary = "TeamLead Delete by id")
     @DeleteMapping("{id}")
-    public ResponseEntity<Response> deleteTeamMember(@PathVariable Long id) {
+    public ResponseEntity<Response> deleteTeamLead(@PathVariable Long id) {
         try {
-            teamMemberService.deleteTeamMember(id);
-            return ResponseEntity.ok(new PositiveResponse("TeamMember Deleted successfully", null));
+            TeamLeadService.deleteTeamLead(id);
+            return ResponseEntity.ok(new PositiveResponse("TeamLead Deleted successfully", null));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new NegativeResponse(e.getMessage()));
         }

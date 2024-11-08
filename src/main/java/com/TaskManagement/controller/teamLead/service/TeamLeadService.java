@@ -1,5 +1,6 @@
 package com.TaskManagement.controller.teamLead.service;
 
+import com.TaskManagement.config.JWTService;
 import com.TaskManagement.controller.company.Company;
 import com.TaskManagement.controller.company.service.CompanyRepository;
 import com.TaskManagement.controller.team.Team;
@@ -29,69 +30,68 @@ import java.util.Map;
 public class TeamLeadService {
     @Autowired
     private final TeamRepository teamRepository;
+    @Autowired
     private final CompanyRepository companyRepository;
+    @Autowired
     private final BCryptPasswordEncoder passwordEncoder;
-    private final TeamLeadRepository teamMemberRepository;
-
-    public TeamLead createTeamMember(CreateTeamLeadDto data) {
-        if (teamMemberRepository.findByEmailOrPhoneNumber(data.getEmail(), data.getPhoneNumber()) != null) {
+    @Autowired
+    private final TeamLeadRepository TeamLeadRepository;
+    @Autowired
+    private final JWTService jwtService;
+    
+    public TeamLead createTeamLead(CreateTeamLeadDto data) {
+        if (TeamLeadRepository.findByEmailOrPhoneNumber(data.getEmail(), data.getPhoneNumber()) != null) {
             throw new AlreadyExistsException(
-                    "TeamMember already exists with email or PhoneNumber " + data.getEmail() + " " + data.getPhoneNumber());
+                    "TeamLead already exists with email or PhoneNumber " + data.getEmail() + " " + data.getPhoneNumber());
         }
-        
+
         Company company = companyRepository.findById(data.getCompanyId())
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found by id"));
-        
-        Team team = teamRepository.findById(data.getTeamId()).orElseThrow(() -> new ResourceNotFoundException("Team is not found by Id"));
 
         String hashedPassword = passwordEncoder.encode(data.getPassword());
 
-        TeamLead newTeamMember = new TeamLead();
-        newTeamMember.setUsername(data.getName());
-        newTeamMember.setEmail(data.getEmail());
-        newTeamMember.setPhoneNumber(data.getPhoneNumber());
-        newTeamMember.setPassword(hashedPassword);
-        newTeamMember.setCompany(company);
-        newTeamMember.setTeam(team);
-
-        teamMemberRepository.save(newTeamMember);
-
-        return newTeamMember;
+        TeamLead newTeamLead = new TeamLead();
+        newTeamLead.setUsername(data.getName());
+        newTeamLead.setEmail(data.getEmail());
+        newTeamLead.setPhoneNumber(data.getPhoneNumber());
+        newTeamLead.setPassword(hashedPassword);
+        newTeamLead.setCompany(company);
+        TeamLeadRepository.save(newTeamLead);
+        return newTeamLead;
     }
 
-    public HashMap<String, Object> TeamMemberLogin(LoginDto data) {
-        TeamLead getTeamMember = teamMemberRepository.findByEmail(data.getEmail());
-        if (getTeamMember == null) {
+    public HashMap<String, Object> TeamLeadLogin(LoginDto data) {
+        TeamLead getTeamLead = TeamLeadRepository.findByEmail(data.getEmail());
+        if (getTeamLead == null) {
             throw new ResourceNotFoundException("Invalid email or password");
         }
 
-        if (!passwordEncoder.matches(data.getPassword(), getTeamMember.getPassword())) {
+        if (!passwordEncoder.matches(data.getPassword(), getTeamLead.getPassword())) {
             throw new ResourceNotFoundException("Invalid email or password");
         }
 
-        getTeamMember.setPassword(null);
+        getTeamLead.setPassword(null);
 
-        String token = "jwtToken";
+        String token = jwtService.generateToken(getTeamLead.getId(), "TeamLead", 10000000L);
         HashMap<String, Object> returnData = new HashMap<String, Object>();
 
         returnData.put("token", token);
-        returnData.put("user", getTeamMember);
+        returnData.put("user", getTeamLead);
 
         return returnData;
     }
 
-    public Map<String, Object> getAllTeamMember(int page, int limit, String search) {
+    public Map<String, Object> getAllTeamLead(int page, int limit, String search) {
         Pageable pageable = PageRequest.of(page-1,limit);
 
-        Page<TeamLead> TeamMemberPage = (search != null) ?
-                teamMemberRepository.findByNameOrPhoneNumberWithRegex(search, pageable) :
-                teamMemberRepository.findAll(pageable);
+        Page<TeamLead> TeamLeadPage = (search != null) ?
+                TeamLeadRepository.findByNameOrPhoneNumberWithRegex(search, pageable) :
+                TeamLeadRepository.findAll(pageable);
 
-        List<TeamLead> list = TeamMemberPage.getContent();
-        System.out.println("TeamMember list " + list);
+        List<TeamLead> list = TeamLeadPage.getContent();
         
-        long totalDocs = TeamMemberPage.getTotalElements();
-        int totalPages = TeamMemberPage.getTotalPages();
+        long totalDocs = TeamLeadPage.getTotalElements();
+        int totalPages = TeamLeadPage.getTotalPages();
 
         Map<String, Object> data = new HashMap<>();
         data.put("list", list);
@@ -101,19 +101,19 @@ public class TeamLeadService {
         return data;
     }
     
-    public Map<String, Object> getAllActiveTeamMember(int page, int limit, String search, boolean active) {
+    public Map<String, Object> getAllActiveTeamLead(int page, int limit, String search, boolean active) {
         Pageable pageable = PageRequest.of(page-1, limit);
-        Page<TeamLead> TeamMemberPage;
+        Page<TeamLead> TeamLeadPage;
 
         if (search != null) {
-            TeamMemberPage = teamMemberRepository.findByNameOrPhoneNumberOrActiveWithRegex(search, pageable, active);
+            TeamLeadPage = TeamLeadRepository.findByNameOrPhoneNumberOrActiveWithRegex(search, pageable, active);
         } else {
-            TeamMemberPage = teamMemberRepository.findByActive(active, pageable);
+            TeamLeadPage = TeamLeadRepository.findByActive(active, pageable);
         }
 
-        List<TeamLead> list = TeamMemberPage.getContent();
-        long totalDocs = TeamMemberPage.getTotalElements();
-        int totalPages = TeamMemberPage.getTotalPages();
+        List<TeamLead> list = TeamLeadPage.getContent();
+        long totalDocs = TeamLeadPage.getTotalElements();
+        int totalPages = TeamLeadPage.getTotalPages();
 
         Map<String, Object> data = new HashMap<>();
         data.put("list", list);
@@ -122,44 +122,39 @@ public class TeamLeadService {
         return data;
     }
     
-    public TeamLead getTeamMemberById(Long id) {
-        return teamMemberRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("TeamMember Not Found By id"));
+    public TeamLead getTeamLeadById(Long id) {
+        return TeamLeadRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("TeamLead Not Found By id"));
     }
 
-    public TeamLead updateTeamMember(Long id, UpdateTeamLeadDto data) {
-        TeamLead getTeamMember = teamMemberRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TeamMember not found by id"));
+    public TeamLead updateTeamLead(Long id, UpdateTeamLeadDto data) {
+        TeamLead getTeamLead = TeamLeadRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("TeamLead not found by id"));
         if (data.getEmail() != null) {
-            getTeamMember.setEmail(data.getEmail());
+            getTeamLead.setEmail(data.getEmail());
         }
 
         if (data.getName() != null) {
-            getTeamMember.setUsername(data.getName());
+            getTeamLead.setUsername(data.getName());
         }
 
         if (data.getPhoneNumber() != null) {
-            getTeamMember.setPhoneNumber(data.getPhoneNumber());
+            getTeamLead.setPhoneNumber(data.getPhoneNumber());
         }
 
         if (data.getCompanyId() != null) {
             Company company = companyRepository.findById(data.getCompanyId())
                     .orElseThrow(() -> new ResourceNotFoundException("Company not found by id"));
-            getTeamMember.setCompany(company);
-        }
-        
-        if (data.getTeamId() != null) {
-                    Team team = teamRepository.findById(data.getCompanyId()).orElseThrow(() -> new ResourceNotFoundException("Company not found by id"));
-            getTeamMember.setTeam(team);
+            getTeamLead.setCompany(company);
         }
 
-        teamMemberRepository.save(getTeamMember);
-        return getTeamMember;
+        TeamLeadRepository.save(getTeamLead);
+        return getTeamLead;
     }
 
     public void updatePassword(Long id, UpdatePasswordDto data) {
-        TeamLead getTeamMember = teamMemberRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TeamMember not found by id"));
-        boolean isPasswordMatch = passwordEncoder.matches(data.getOldPassword(), getTeamMember.getPassword());
+        TeamLead getTeamLead = TeamLeadRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("TeamLead not found by id"));
+        boolean isPasswordMatch = passwordEncoder.matches(data.getOldPassword(), getTeamLead.getPassword());
 
         if (!isPasswordMatch) {
             throw new ValidationException("Old password did not match");
@@ -167,27 +162,27 @@ public class TeamLeadService {
 
         String hashPassword = passwordEncoder.encode(data.getNewPassword());
 
-        getTeamMember.setPassword(hashPassword);
+        getTeamLead.setPassword(hashPassword);
 
-        teamMemberRepository.save(getTeamMember);
+        TeamLeadRepository.save(getTeamLead);
     }
 
     public void updateStatus(Long id) {
-        TeamLead getTeamMember = teamMemberRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TeamMember not found by id"));
-        if (getTeamMember.getActive() == true) {
-            getTeamMember.setActive(false);
+        TeamLead getTeamLead = TeamLeadRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("TeamLead not found by id"));
+        if (getTeamLead.getActive() == true) {
+            getTeamLead.setActive(false);
         } else {
-            getTeamMember.setActive(true);
+            getTeamLead.setActive(true);
         }
 
-        teamMemberRepository.save(getTeamMember);
+        TeamLeadRepository.save(getTeamLead);
     }
 
-    public void deleteTeamMember(Long id) {
-        TeamLead teamMember = teamMemberRepository.findById(id)
+    public void deleteTeamLead(Long id) {
+        TeamLead TeamLead = TeamLeadRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        teamMemberRepository.delete(teamMember);
+        TeamLeadRepository.delete(TeamLead);
     }
 
 }

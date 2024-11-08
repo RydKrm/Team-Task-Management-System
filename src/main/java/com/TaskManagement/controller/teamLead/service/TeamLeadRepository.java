@@ -24,6 +24,4 @@ public interface TeamLeadRepository extends JpaRepository<TeamLead, Long>{
 
     public Page<TeamLead> findByCompany(Company company, Pageable pageable);
 
-    public Page<TeamLead> findByTeam(Team team, Pageable pageable);
-
 }
