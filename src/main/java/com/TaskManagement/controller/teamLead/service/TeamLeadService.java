@@ -48,6 +48,9 @@ public class TeamLeadService {
         Company company = companyRepository.findById(data.getCompanyId())
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found by id"));
 
+        Team team = teamRepository.findById(data.getTeamId()).orElseThrow(()-> new ResourceNotFoundException("Team not found"));
+
+
         String hashedPassword = passwordEncoder.encode(data.getPassword());
 
         TeamLead newTeamLead = new TeamLead();
@@ -56,6 +59,7 @@ public class TeamLeadService {
         newTeamLead.setPhoneNumber(data.getPhoneNumber());
         newTeamLead.setPassword(hashedPassword);
         newTeamLead.setCompany(company);
+        newTeamLead.setTeam(team);
         TeamLeadRepository.save(newTeamLead);
         return newTeamLead;
     }
@@ -84,9 +88,11 @@ public class TeamLeadService {
     public Map<String, Object> getAllTeamLead(int page, int limit, String search) {
         Pageable pageable = PageRequest.of(page-1,limit);
 
-        Page<TeamLead> TeamLeadPage = (search != null) ?
-                TeamLeadRepository.findByNameOrPhoneNumberWithRegex(search, pageable) :
-                TeamLeadRepository.findAll(pageable);
+//        Page<TeamLead> TeamLeadPage = (search != null) ?
+//                TeamLeadRepository.findByNameOrPhoneNumberWithRegex(search, pageable) :
+//                TeamLeadRepository.findAll(pageable);
+
+        Page<TeamLead> TeamLeadPage = TeamLeadRepository.getAllTeamLead(pageable);
 
         List<TeamLead> list = TeamLeadPage.getContent();
         
@@ -145,6 +151,12 @@ public class TeamLeadService {
             Company company = companyRepository.findById(data.getCompanyId())
                     .orElseThrow(() -> new ResourceNotFoundException("Company not found by id"));
             getTeamLead.setCompany(company);
+        }
+
+        if (data.getTeamId() != null) {
+            Team team = teamRepository.findById(data.getTeamId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Team not found by id"));
+            getTeamLead.setTeam(team);
         }
 
         TeamLeadRepository.save(getTeamLead);

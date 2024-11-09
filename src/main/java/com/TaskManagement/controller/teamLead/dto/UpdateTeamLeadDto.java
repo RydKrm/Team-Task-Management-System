@@ -11,4 +11,5 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 public class UpdateTeamLeadDto extends UpdateUserDto {
     private Long companyId;
+    private Long teamId;
 }

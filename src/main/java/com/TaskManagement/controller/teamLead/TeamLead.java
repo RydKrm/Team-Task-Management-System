@@ -41,13 +41,14 @@ public class TeamLead {
     private String password;
 
     @NotNull(message = "Team Field is required")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Company company;
 
     @NotNull(message = "Team id is required")
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
+    @JsonIgnore
     private Team team;
 
     private boolean active = true;

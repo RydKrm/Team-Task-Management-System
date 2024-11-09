@@ -4,5 +4,6 @@ public enum TaskStatus {
     PENDING,
     COMPLETE,
     RUNNING,
-    SHIFT
+    SHIFT,
+    DRAFT
 }

@@ -4,6 +4,7 @@ package com.TaskManagement.controller.task;
 import com.TaskManagement.controller.teamLead.TeamLead;
 import com.TaskManagement.controller.teamMember.TeamMember;
 import com.TaskManagement.enums.TaskStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.util.Date;
+
 
 @Getter
 @Setter
@@ -29,10 +31,12 @@ public class Task {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.EAGER,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private TeamLead teamLead;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private TeamMember teamMember;
 
     @NotNull(message = "Date is required")
@@ -41,6 +45,6 @@ public class Task {
     private int totalDays;
 
     @Enumerated(EnumType.STRING)
-    private TaskStatus status = TaskStatus.PENDING;
+    private TaskStatus status = TaskStatus.DRAFT;
 
 }
